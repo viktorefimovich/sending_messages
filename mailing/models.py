@@ -1,96 +1,99 @@
 from django.db import models
-
-NULLABLE = {"blank": True, "null": True}
-
-
-class Client(models.Model):
-    email = models.EmailField(verbose_name="Почта для рассылки")
-    first_name = models.CharField(**NULLABLE, verbose_name="Имя", max_length=150)
-    last_name = models.CharField(**NULLABLE, verbose_name="Фамилия", max_length=150)
-    comment = models.TextField(**NULLABLE, verbose_name="Комментарий")
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.email})"
-
-    class Meta:
-        verbose_name = "Клиент"
-        verbose_name_plural = "Клиенты"
+from users.models import User
 
 
-class MailingMessage(models.Model):
-    subject = models.CharField(max_length=250, verbose_name="Тема письма")
-    message = models.TextField(verbose_name="Тело письма")
+class Recipient(models.Model):
 
-    def __str__(self):
-        return f"{self.subject}"
-
-    class Meta:
-        verbose_name = "Письмо"
-        verbose_name_plural = "Письма"
-
-
-class MailingSettings(models.Model):
-
-    PERIOD_DAILY = "daily"
-    PERIOD_WEEKLY = "weekly"
-    PERIOD_MONTHLY = "monthly"
-
-    PERIODS = (
-        (PERIOD_DAILY, "Ежедневная"),
-        (PERIOD_WEEKLY, "Раз в неделю"),
-        (PERIOD_MONTHLY, "Раз в месяц"),
+    email = models.EmailField(unique=True, verbose_name="почта получателя")
+    full_name = models.CharField(max_length=100, verbose_name="Ф.И.О.")
+    commentary = models.TextField(verbose_name="Комментарий о получателе рассылки")
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Владелец модели получателя",
+        blank=True,
+        null=True
     )
 
-    STATUS_CREATED = "created"
-    STATUS_STARTED = "started"
-    STATUS_DONE = "done"
-    STATUSES = (
-        (STATUS_STARTED, "Запущена"),
-        (STATUS_CREATED, "Создана"),
-        (STATUS_DONE, "Завершена"),
+    def __str__(self):
+        return f"{self.full_name} | {self.email}"
+
+    class Meta:
+        verbose_name = "Получатель рассылки"
+        verbose_name_plural = "Получатели рассылки"
+
+
+class Message(models.Model):
+    subject = models.CharField(max_length=100, verbose_name="тема сообщения")
+    message_text = models.TextField(verbose_name="текст сообщения")
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Владелец модели сообщения",
+        blank=True,
+        null=True
     )
 
-    time = models.TimeField(verbose_name="Время")
-    period = models.CharField(max_length=20, choices=PERIODS, default=PERIOD_DAILY, verbose_name="Период")
-    status = models.CharField(max_length=20, choices=STATUSES, default=STATUS_CREATED, verbose_name="Статус")
-
-    message = models.ForeignKey("MailingMessage", on_delete=models.CASCADE, verbose_name="Сообщение", **NULLABLE)
-
     def __str__(self):
-        return f"{self.time} / {self.period}"
+        max_length = 20
+        is_long = len(self.subject.__str__()) > max_length
+        add_symb = ""
+        if is_long:
+            add_symb = "..."
+
+        return f"{self.pk} | {self.subject[:max_length]}{add_symb}"
 
     class Meta:
-        verbose_name = "Настройка"
-        verbose_name_plural = "Настройки"
+        verbose_name = "Сообщение"
+        verbose_name_plural = "Сообщения"
 
 
-class MailingClient(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="Клиент")
-    settings = models.ForeignKey(MailingSettings, on_delete=models.CASCADE, verbose_name="Настройка")
+class Mailing(models.Model):
+    STATUS_CHOICES = [
+        ("Завершена", "Завершена"),
+        ("Создана", "Создана"),
+        ("Запущена", "Запущена"),
+    ]
 
-    def __str__(self):
-        return f"{self.client} / {self.settings}"
-
-    class Meta:
-        verbose_name = "Клиент рассылки"
-        verbose_name_plural = "Клиенты рассылки"
-
-
-class MailingLog(models.Model):
-    STATUS_OK = "ok"
-    STATUS_FAILED = "failed"
-    STATUSES = (
-        (STATUS_OK, "Успешно"),
-        (STATUS_FAILED, "Ошибка"),
+    mailing_start_at = models.DateTimeField(verbose_name="дата и время первой отправки", blank=True, null=True)
+    mailing_end_at = models.DateTimeField(verbose_name="дата и время окончания отправки", blank=True, null=True)
+    status = models.CharField(choices=STATUS_CHOICES, verbose_name="статус", default="Создана")
+    message = models.ForeignKey(
+        Message,
+        on_delete=models.CASCADE,
+        verbose_name="сообщение",
+    )
+    receivers = models.ManyToManyField(Recipient, "receivers", verbose_name="получатели")
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Владелец модели рассылки",
+        blank=True,
+        null=True
     )
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="Клиент")
-    settings = models.ForeignKey(MailingSettings, on_delete=models.CASCADE, verbose_name="Настройка")
-
-    status = models.CharField(choices=STATUSES, default=STATUS_OK, verbose_name="Статус")
-
-    last_try = models.DateTimeField(auto_now_add=True, verbose_name="Дата последней попытки")
+    def __str__(self):
+        return f"{self.pk} | {self.owner} | {self.status}"
 
     class Meta:
-        verbose_name = "Лог"
-        verbose_name_plural = "Логи"
+        verbose_name = "Рассылка"
+        verbose_name_plural = "Рассылки"
+
+
+class MailingAttempt(models.Model):
+    STATUS_CHOICES = [
+        ("Успешно", "Успешно"),
+        ("Не успешно", "Не успешно")
+    ]
+
+    attempt_at = models.DateTimeField(auto_now_add=True, verbose_name="дата и время попытки")
+    status = models.CharField(choices=STATUS_CHOICES, verbose_name="статус попытки")
+    server_response = models.TextField(verbose_name="ответ почтового сервера")
+    mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, verbose_name="рассылка")
+
+    def __str__(self):
+        return f"{self.pk} | {self.status}"
+
+    class Meta:
+        verbose_name = "Попытка рассылки"
+        verbose_name_plural = "Попытки рассылки"
