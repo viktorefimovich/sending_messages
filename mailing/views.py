@@ -1,6 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, DetailView
 
+from mailing import forms
 from mailing.models import Mailing
 from mailing.services import MailingService
 
@@ -43,3 +46,21 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
 
         return super().form_valid(form)
 
+
+class MailingDetailView(LoginRequiredMixin, DetailView):
+    model = Mailing
+    template_name = "mailing/mailing_detail.html"
+    context_object_name = "mailing"
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+
+        can_view = [
+            request.user == query_item.owner,
+            request.user.has_perm("mailing.can_manage_mailing"),
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
