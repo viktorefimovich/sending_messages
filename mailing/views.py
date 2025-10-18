@@ -6,6 +6,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 from mailing import forms
 from mailing.models import Mailing, Recipient, Message, MailingAttempt
 from mailing.services import MailingService, MailingAttemptsService
+from users.models import User
 
 
 class MailingListView(ListView):
@@ -292,3 +293,65 @@ class AttemptDetailView(DetailView):
             return redirect("mailing:access_denied")
 
         return super().get(request, *args, **kwargs)
+
+
+class UsersListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "mailing/users_list.html"
+    context_object_name = "musers"
+
+    def get(self, request, *args, **kwargs):
+
+        can_view = [
+            request.user.is_staff,
+            request.user.has_perm("users.can_manage_users"),
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        current_user = self.request.user.pk
+        queryset = User.objects.exclude(pk=current_user).exclude(is_staff=True)
+        return queryset
+
+
+class UsersDetailView(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = "mailing/users_detail.html"
+    context_object_name = "muser"
+
+    def get(self, request, *args, **kwargs):
+
+        can_view = [
+            request.user.is_staff,
+            request.user.has_perm("mailing.can_manage_users"),
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
+
+
+class UsersActiveSwitch(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = "mailing/users_detail.html"
+
+    def get(self, request, *args, **kwargs):
+        muser_id = self.kwargs["pk"]
+        muser = User.objects.get(pk=muser_id)
+
+        can_use = [
+            request.user.has_perm("mailing.can_manage_mailing"),
+        ]
+
+        if not any(can_use):
+            return redirect("mailing:access_denied")
+
+        muser.is_active = muser.is_active is False
+        muser.save()
+
+        return redirect("mailing:mailing_detail", pk=muser_id)

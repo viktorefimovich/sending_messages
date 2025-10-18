@@ -1,0 +1,44 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Инфо о "{{muser.username}}"{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <div>
+        <h1>Информация о "{{muser.username}}".</h1>
+    </div>
+
+    <div class="mt-5">
+        <p>Почта: {{muser.email}}</p>
+        <p>Имя: {{muser.last_name}} {{muser.first_name}}</p>
+        <p>
+            Активен: {{muser.is_active|yesno:"Да, Нет"}}
+            <a href="{% url 'mailing:active_switch' muser.pk %}" class="btn btn-outline-danger btn-sm">
+                {% if muser.is_active %}Заблокировать{% else %}Разблокировать{% endif %}
+            </a>
+        </p>
+        <p>Страна проживания: {{muser.country}}</p>
+        <p>Номер телефона: {{muser.phone_number}}</p>
+        <p>Рассылки({{muser.mailings.all.count}}):</p>
+        {% if muser.mailings.all.count > 0 %}
+            <div class="card-text">
+                {% for i in muser.mailings.all %}
+                <a class="btn btn-outline-info m-1" href="{% url 'mailing:receiver_detail' i.pk %}">{{i.message.subject}}</a>
+
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+
+
+        <hr>
+
+        <a href="{% url 'mailing:users_list' %}" class="btn btn-primary">Назад</a>
+
+    </div>
+
+</div>
+
+{% endblock %}
