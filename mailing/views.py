@@ -119,3 +119,18 @@ class ReceiverListView(LoginRequiredMixin, ListView):
         queryset = user.receivers.all()
 
         return queryset
+
+
+class ReceiverCreateView(LoginRequiredMixin, CreateView):
+    model = Recipient
+    form_class = forms.ReceiverForm
+    template_name = "mailing/receiver_new.html"
+    success_url = reverse_lazy("mailing:receiver_list")
+
+    def form_valid(self, form):
+        receiver = form.save()
+        user = self.request.user
+        receiver.owner = user
+        user.save()
+
+        return super().form_valid(form)
