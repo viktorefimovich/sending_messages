@@ -1,0 +1,41 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Список получателей{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <div class="text-center">
+        <h1>Управление вашими получателями</h1>
+        <a href="{% url 'mailing:receiver_new' %}" class="btn btn-primary">Новый получатель</a>
+    </div>
+
+
+    <div class="mt-5">
+        {% if receivers|length > 0 %}
+        <ul class="list-group list-group-horizontal">
+            <li class="list-group-item col-3"><h4>ФИО</h4></li>
+            <li class="list-group-item col-4"><h4>Почта</h4></li>
+        </ul>
+            {% for receiver in receivers %}
+            <div class="row">
+                <a href="{% url 'mailing:receiver_detail' receiver.pk %}" class="text-decoration-none">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item col-3">{{receiver.full_name}}</li>
+                    <li class="list-group-item col-4">{{receiver.email}}</li>
+                </ul>
+            </a>
+            </div>
+
+            {% endfor %}
+        {% else %}
+            <div>
+                <h2 style="color: red" class="text-center mt-5">У вас пока нет получателей</h2>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
