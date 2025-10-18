@@ -21,6 +21,7 @@ class Recipient(models.Model):
     class Meta:
         verbose_name = "Получатель рассылки"
         verbose_name_plural = "Получатели рассылки"
+        permissions = [("can_manage_clients", "Управление клиентами")]
 
 
 class Message(models.Model):
@@ -46,6 +47,7 @@ class Message(models.Model):
     class Meta:
         verbose_name = "Сообщение"
         verbose_name_plural = "Сообщения"
+        permissions = [("can_manage_message", "Управление сообщениями")]
 
 
 class Mailing(models.Model):
@@ -78,6 +80,7 @@ class Mailing(models.Model):
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
+        permissions = [("can_manage_mailing", "Управление рассылкой")]
 
 
 class MailingAttempt(models.Model):
