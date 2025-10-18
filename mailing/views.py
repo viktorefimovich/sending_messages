@@ -155,3 +155,19 @@ class ReceiverDetailView(LoginRequiredMixin, DetailView):
             return redirect("mailing:access_denied")
 
         return super().get(request, *args, **kwargs)
+
+
+class ReceiverUpdateView(LoginRequiredMixin, UpdateView):
+    model = Recipient
+    form_class = forms.ReceiverForm
+    template_name = "mailing/receiver_new.html"
+
+    def get_success_url(self):
+        return reverse("mailing:receiver_detail", kwargs={"pk": self.object.pk})
+
+
+class ReceiverDeleteView(LoginRequiredMixin, DeleteView):
+    model = Recipient
+    template_name = "mailing/receiver_delete_confirm.html"
+    success_url = reverse_lazy("mailing:receiver_list")
+
