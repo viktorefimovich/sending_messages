@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
 
 from mailing import forms
 from mailing.models import Mailing, Recipient, Message
@@ -254,4 +254,12 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
         if not any(can_view):
             return redirect("mailing:access_denied")
 
+        return super().get(request, *args, **kwargs)
+
+
+class AcessDenied(TemplateView):
+    template_name = "mailing/access_denied.html"
+
+    def get(self, request, *args, **kwargs):
+        print(f"{request.user} Пытался получить доступ к запрещённому контенту.")
         return super().get(request, *args, **kwargs)
