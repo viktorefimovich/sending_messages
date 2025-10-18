@@ -6,7 +6,6 @@ from django.urls import path
 
 app_name = MailingConfig.name
 
-
 urlpatterns = [
     path("", views.MailingListView.as_view(), name="main_page"),
     path("mailing_new/", views.MailingCreateView.as_view(), name="mailing_new"),
