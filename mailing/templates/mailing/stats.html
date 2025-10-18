@@ -1,0 +1,24 @@
+{% extends 'mailing/base.html' %}
+
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <div class="mt-5">
+        <h1>
+            Моя статистика
+        </h1>
+    </div>
+    <div>
+        <p>Имеется рассылок: {{mailings|length}}</p>
+        <p>Успешные попытки рассылки сообщений: {{attempts_success}} </p>
+        <p>Неудачные попытки рассылки сообщений: {{attempts_failed}}</p>
+        <p>Всего попыток: {{attempts_total}}</p>
+    </div>
+</div>
+
+
+
+{% endblock %}

@@ -355,3 +355,89 @@ class UsersActiveSwitch(LoginRequiredMixin, DetailView):
         muser.save()
 
         return redirect("mailing:mailing_detail", pk=muser_id)
+
+
+class MailingPush(LoginRequiredMixin, DetailView):
+    model = Mailing
+    template_name = "mailing/mailing_detail.html"
+
+    def get(self, request, *args, **kwargs):
+        mailing_id = self.kwargs["pk"]
+        mailing = Mailing.objects.get(pk=mailing_id)
+        user = request.user
+
+        can_use = [
+            request.user.has_perm("mailing.can_manage_mailing"),
+            user == mailing.owner,
+        ]
+
+        if not any(can_use):
+            return redirect("mailing:access_denied")
+
+        mailing.status = "Запущена"
+        mailing.save()
+        MailingService.mailing_push(mailing.pk)
+
+        return redirect("mailing:mailing_detail", pk=mailing_id)
+
+
+class MailingCancel(LoginRequiredMixin, DetailView):
+    model = Mailing
+    template_name = "mailing/mailing_detail.html"
+
+    def get(self, request, *args, **kwargs):
+        mailing_id = self.kwargs["pk"]
+        mailing = Mailing.objects.get(pk=mailing_id)
+        user = request.user
+
+        can_use = [
+            request.user.has_perm("mailing.can_manage_mailing"),
+            user == mailing.owner,
+        ]
+
+        if not any(can_use):
+            return redirect("mailing:access_denied")
+
+        mailing.status = "Завершена"
+        mailing.save()
+
+        return redirect("mailing:mailing_detail", pk=mailing_id)
+
+
+class MailingReOpen(LoginRequiredMixin, DetailView):
+    model = Mailing
+    template_name = "mailing/mailing_detail.html"
+
+    def get(self, request, *args, **kwargs):
+        mailing_id = self.kwargs["pk"]
+        mailing = Mailing.objects.get(pk=mailing_id)
+        user = request.user
+
+        can_use = [
+            request.user.has_perm("mailing.can_manage_mailing"),
+            user == mailing.owner,
+        ]
+
+        if not any(can_use):
+            return redirect("mailing:access_denied")
+
+        mailing.status = "Создана"
+        mailing.save()
+
+        return redirect("mailing:mailing_detail", pk=mailing_id)
+
+
+class StatisticTemplateView(LoginRequiredMixin, TemplateView):
+    template_name = "mailing/stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        attempts = MailingAttemptsService.get_my_attempts(self.request.user.pk)
+
+        context["mailings"] = self.request.user.mailings.all()
+        context["attempts_success"] = sum([x.status == "Успешно" for x in attempts])
+        context["attempts_failed"] = sum([x.status != "Успешно" for x in attempts])
+        context["attempts_total"] = len(attempts)
+
+        return context
