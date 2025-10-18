@@ -1,21 +1,25 @@
-{% extends "mailing/base.html" %}
+{% extends 'mailing/base.html' %}
+
+{% block title %}Авторизация{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <form class="row" method="post" enctype="multipart/form-data">
-                <div class="card">
-                    <div class="card-body">
-                        {% csrf_token %}
-                        {{ form.as_p}}
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        Войти
-                    </button>
-                    <a href="{% url 'users:register' %}" class="btn btn-secondary">Регистрация</a>
-                </div>
-            </form>
+
+<div class="px-4 py-5 my-5 text-center">
+    <img class="d-block mx-auto mb-4" src="/static/imgs/mailing-service-logo.png" alt="" width="150">
+    <h1 class="display-5 fw-bold text-body-emphasis">Авторизация</h1>
+    <div class="col-lg-6 mx-auto">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <form method="post" action="" class="mt-5">
+                    {% csrf_token %}
+
+                    {{form.as_p}}
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                    <a href="{% url 'users:register' %}" class="btn">Регистрация</a>
+                    <br>
+                    <a href="{% url 'users:password_reset' %}" class="btn mt-1">Забыл(-а) пароль</a>
+                </form>
         </div>
     </div>
 </div>
-{% endblock %}
+
+{% endblock%}
