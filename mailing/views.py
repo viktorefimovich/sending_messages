@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from mailing import forms
 from mailing.models import Mailing
@@ -80,6 +80,22 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
         can_view = [
             request.user == query_item.owner,
         ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
+
+
+class MailingDeleteView(LoginRequiredMixin, DeleteView):
+    model = Mailing
+    template_name = "mailing/mailing_delete_confirm.html"
+    success_url = reverse_lazy("mailing:main_page")
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+
+        can_view = [request.user == query_item.owner]
 
         if not any(can_view):
             return redirect("mailing:access_denied")
