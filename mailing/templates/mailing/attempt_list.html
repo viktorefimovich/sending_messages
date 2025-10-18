@@ -1,0 +1,42 @@
+{% extends 'mailing/base.html' %}
+
+
+{% block title %}Список попыток рассылки{% endblock %}
+
+{% block content %}
+
+
+<div class="mt-5">
+    <div class="text-center">
+        <h1>Просмотр попыток рассылки</h1>
+    </div>
+    {% if attempts|length > 0 %}
+        <div class="mt-5">
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item col-3"><h4>Рассылка</h4></li>
+                <li class="list-group-item col-4"><h4>Статус</h4></li>
+                <li class="list-group-item col-4"><h4>Ответ почтового сервера</h4></li>
+            </ul>
+
+            {% for attempt in attempts %}
+            <div class="row">
+                <a href="{% url 'mailing:attempt_detail' attempt.pk %}" class="text-decoration-none">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item col-3">{{attempt.mailing.pk}}</li>
+                    <li class="list-group-item col-4">{{attempt.status}}</li>
+                    <li class="list-group-item col-4">{{attempt.server_response}}</li>
+                </ul>
+            </a>
+            </div>
+
+            {% endfor %}
+        </div>
+    {% else %}
+        <div>
+            <h2 style="color: red" class="text-center mt-5">Здесь пока пусто</h2>
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -4,8 +4,8 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
 
 from mailing import forms
-from mailing.models import Mailing, Recipient, Message
-from mailing.services import MailingService
+from mailing.models import Mailing, Recipient, Message, MailingAttempt
+from mailing.services import MailingService, MailingAttemptsService
 
 
 class MailingListView(ListView):
@@ -257,9 +257,38 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
         return super().get(request, *args, **kwargs)
 
 
-class AcessDenied(TemplateView):
+class AccessDenied(TemplateView):
     template_name = "mailing/access_denied.html"
 
     def get(self, request, *args, **kwargs):
         print(f"{request.user} Пытался получить доступ к запрещённому контенту.")
+        return super().get(request, *args, **kwargs)
+
+
+class AttemptListView(LoginRequiredMixin, ListView):
+    model = MailingAttempt
+    template_name = "mailing/attempt_list.html"
+    context_object_name = "attempts"
+
+    def get_queryset(self):
+        queryset = MailingAttemptsService.get_my_attempts(self.request.user.pk)
+        return queryset
+
+
+class AttemptDetailView(DetailView):
+    model = MailingAttempt
+    template_name = "mailing/attempt_detail.html"
+    context_object_name = "attempt"
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        attempt_pk = self.kwargs['pk']
+
+        can_view = [
+            MailingAttemptsService.is_attempt_owner(attempt_pk=attempt_pk, user=user)
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
         return super().get(request, *args, **kwargs)

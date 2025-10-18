@@ -1,0 +1,25 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Информация о попытке{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <div>
+        <h1>Информация о рассылке "{{attempt.pk}}".</h1>
+    </div>
+
+    <div class="mt-5">
+        <p>Время рассылки: {{attempt.attempt_at}}</p>
+        <p>Статус: {{attempt.status}}</p>
+        <p>Ответ почтового сервера: {{attempt.server_response}}</p>
+        <p>ID Рассылки: {{attempt.mailing.pk}} <a href="{% url 'mailing:mailing_detail' attempt.mailing.pk %}" class="btn btn-primary btn-sm">Подробнее</a></p>
+
+        <hr>
+        <a href="{% url 'mailing:attempt_list' %}" class="btn btn-primary">Назад</a>
+
+    </div>
+
+</div>
+
+{% endblock %}

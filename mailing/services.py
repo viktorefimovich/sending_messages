@@ -77,7 +77,7 @@ class MailingAttemptsService:
         return attempts
 
     @staticmethod
-    def is_attempt_owner(atempt_pk, user):
-        user_attempt = MailingAttempt.objects.get(pk=atempt_pk)
+    def is_attempt_owner(attempt_pk, user):
+        user_attempt = MailingAttempt.objects.get(pk=attempt_pk)
 
         return user_attempt.mailing.owner == user
