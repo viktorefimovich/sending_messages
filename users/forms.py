@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm
 
 from .models import User
 
@@ -26,11 +26,43 @@ class StyleFormMixin:
                 field.widget.attrs['class'] = 'form-control'
 
 
-class UserRegisterForm(StyleFormMixin, UserCreationForm):
-    phone_number = forms.CharField(max_length=15, required=False,
-                                   help_text='Необязательное поле. Введите ваш номер телефона.')
-    username = forms.CharField(max_length=50, required=True, help_text='Псевдоним')
+class MailingUserCreationForm(StyleFormMixin, UserCreationForm):
+    phone_number = forms.CharField(
+        max_length=15, required=True, help_text="Введите ваш номер телефона."
+    )
+    username = forms.CharField(max_length=50, required=True, help_text="Псевдоним")
+    country = forms.CharField(
+        max_length=20, required=True, help_text="Страна проживания"
+    )
 
     class Meta:
         model = User
-        fields = ("email", "username", "first_name", "last_name", "phone_number", 'password1', 'password2',)
+        fields = (
+            "email",
+            "username",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "country",
+            "password1",
+            "password2",
+        )
+
+
+class MailingUserChangeForm(StyleFormMixin, UserChangeForm):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "avatar",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "country",
+        )
+
+
+class MailingUserPassRestore(PasswordResetForm):
+    class Meta:
+        model = User
+        fields = ("email",)
