@@ -4,7 +4,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from mailing import forms
-from mailing.models import Mailing, Recipient
+from mailing.models import Mailing, Recipient, Message
 from mailing.services import MailingService
 
 
@@ -171,3 +171,87 @@ class ReceiverDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "mailing/receiver_delete_confirm.html"
     success_url = reverse_lazy("mailing:receiver_list")
 
+
+class MessageListView(LoginRequiredMixin, ListView):
+    model = Message
+    template_name = "mailing/message_list.html"
+
+    context_object_name = "messages"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.has_perm("mailing.can_manage_message"):
+            return Message.objects.all()
+        queryset = user.messages.all()
+
+        return queryset
+
+
+class MessageCreateView(LoginRequiredMixin, CreateView):
+    model = Message
+    form_class = forms.MessageForm
+    template_name = "mailing/message_new.html"
+    success_url = reverse_lazy("mailing:message_list")
+
+    def form_valid(self, form):
+        receiver = form.save()
+        user = self.request.user
+        receiver.owner = user
+        user.save()
+
+        return super().form_valid(form)
+
+
+class MessageDetailView(LoginRequiredMixin, DetailView):
+    model = Message
+    template_name = "mailing/message_detail.html"
+    context_object_name = "message"
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+        user = request.user
+
+        can_view = [
+            user == query_item.owner,
+            user.has_perm("mailing.can_manage_message"),
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
+
+
+class MessageUpdateView(LoginRequiredMixin, UpdateView):
+    model = Message
+    form_class = forms.MessageForm
+    template_name = "mailing/message_new.html"
+
+    def get_success_url(self):
+        return reverse("mailing:message_detail", kwargs={"pk": self.object.pk})
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+
+        can_view = [request.user == query_item.owner]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
+
+
+class MessageDeleteView(LoginRequiredMixin, DeleteView):
+    model = Message
+    template_name = "mailing/message_delete_confirm.html"
+    success_url = reverse_lazy("mailing:message_list")
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+
+        can_view = [request.user == query_item.owner]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
