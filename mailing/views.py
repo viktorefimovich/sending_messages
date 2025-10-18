@@ -1,4 +1,5 @@
-from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, CreateView
 
 from mailing.models import Mailing
 from mailing.services import MailingService
@@ -27,4 +28,18 @@ class MailingListView(ListView):
 
         return context
 
+
+class MailingCreateView(LoginRequiredMixin, CreateView):
+    model = Mailing
+    form_class = forms.MailingForm
+    template_name = "mailing/mailing_new.html"
+    success_url = reverse_lazy("mailing:main_page")
+
+    def form_valid(self, form):
+        mailing = form.save()
+        user = self.request.user
+        mailing.owner = user
+        user.save()
+
+        return super().form_valid(form)
 
