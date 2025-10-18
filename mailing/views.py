@@ -134,3 +134,24 @@ class ReceiverCreateView(LoginRequiredMixin, CreateView):
         user.save()
 
         return super().form_valid(form)
+
+
+class ReceiverDetailView(LoginRequiredMixin, DetailView):
+    model = Recipient
+    template_name = "mailing/receiver_detail.html"
+    context_object_name = "receiver"
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+
+        user = request.user
+
+        can_view = [
+            user == query_item.owner,
+            user.has_perm("mailing.can_manage_clients"),
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
