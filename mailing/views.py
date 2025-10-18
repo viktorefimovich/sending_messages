@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DetailView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
 from mailing import forms
 from mailing.models import Mailing
@@ -58,6 +58,27 @@ class MailingDetailView(LoginRequiredMixin, DetailView):
         can_view = [
             request.user == query_item.owner,
             request.user.has_perm("mailing.can_manage_mailing"),
+        ]
+
+        if not any(can_view):
+            return redirect("mailing:access_denied")
+
+        return super().get(request, *args, **kwargs)
+
+
+class MailingUpdateView(LoginRequiredMixin, UpdateView):
+    model = Mailing
+    form_class = forms.MailingForm
+    template_name = "mailing/mailing_new.html"
+
+    def get_success_url(self):
+        return reverse("mailing:mailing_detail", kwargs={"pk": self.object.pk})
+
+    def get(self, request, *args, **kwargs):
+        query_item = self.model.objects.get(pk=self.kwargs["pk"])
+
+        can_view = [
+            request.user == query_item.owner,
         ]
 
         if not any(can_view):
