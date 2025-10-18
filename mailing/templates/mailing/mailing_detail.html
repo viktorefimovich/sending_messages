@@ -1,0 +1,61 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Детали рассылки "{{mailing.message.subject|truncatechars:10}}"{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+
+    <h2 class="text-center col-6">{{mailing.message.subject}}</h2>
+    <div class="card col-6 mt-5">
+        <div class="card-header text-center">
+            <h5>Получатели</h5>
+        </div>
+        <div class="card-text p-3">
+            {% for i in mailing.receivers.all %}
+            <a class="btn btn-outline-info m-1" href="{% url 'mailing:receiver_detail' i.pk %}">{{i.full_name}}</a>
+
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr class="col-6">
+
+    <div class="text-center col-6 mt-2">
+        <h4>
+            Содержание текста рассылки:
+        </h4>
+
+        <p>
+            {{mailing.message.message_text}}
+        </p>
+
+    </div>
+    <hr class="col-6">
+    <h2 class="mb-5">Статус: {{mailing.status}}
+        {% if mailing.status == "Создана" and not perms.mailing.can_manage_mailing %}
+            <a href="{% url 'mailing:mailing_push' mailing.pk %}" class="btn btn-outline-success btn-sm">Пуск</a>
+        {% endif %}
+        {% if mailing.status != "Завершена" and not perms.mailing.can_manage_mailing %}
+            <a href="{% url 'mailing:mailing_cancel' mailing.pk %}" class="btn btn-outline-danger btn-sm">Отмена рассылки</a>
+
+        {% elif mailing.status == "Завершена" and not perms.mailing.can_manage_mailing %}
+            <a href="{% url 'mailing:mailing_reopen' mailing.pk %}" class="btn btn-outline-danger btn-sm">Заново</a>
+
+        {% endif %}
+
+        {% if perms.mailing.can_manage_mailing and mailing.status != "Завершена"%}
+            <a href="{% url 'mailing:mailing_cancel' mailing.pk %}" class="btn btn-outline-danger btn-sm">Отмена рассылки</a>
+
+        {% endif %}
+    </h2>
+
+
+    <div class="btn-group col-4">
+        <a href="{% url 'mailing:mailing_update' mailing.pk %}" class="btn btn-warning col-6">Редактировать</a>
+        <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-danger col-6">Удалить</a>
+    </div>
+    <a href="{% url 'mailing:main_page' %}" class="btn btn-primary mx-2">Назад</a>
+</div>
+
+{% endblock %}
