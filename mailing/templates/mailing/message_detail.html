@@ -1,0 +1,27 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Инфо о "{{message.subject}}"{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <div>
+        <h1>Информация о "{{message.subject}}".</h1>
+    </div>
+
+    <div class="mt-5">
+
+        <p>Тема: {{message.subject}}</p>
+        <p>Текст: {{message.message_text}}</p>
+        <hr>
+        <div class="btn-group col-4">
+            <a href="{% url 'mailing:message_update' message.pk %}" class="btn btn-warning col-6">Редактировать</a>
+            <a href="{% url 'mailing:message_delete' message.pk %}" class="btn btn-danger col-6">Удалить</a>
+        </div>
+        <a href="{% url 'mailing:message_list' %}" class="btn btn-primary">Назад</a>
+
+    </div>
+
+</div>
+
+{% endblock %}

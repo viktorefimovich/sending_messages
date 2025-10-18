@@ -7,7 +7,7 @@
         <div class="col-3"></div>
 
         <div class="col-6">
-            <h1>Хотете удалить "{{receiver.full_name}}" ?</h1>
+            <h1>Хотите удалить "{{message.subject}}" ?</h1>
             <form method="post">
                 {% csrf_token %}
                 <button class="btn btn-danger" type="submit">Удалить</button>
