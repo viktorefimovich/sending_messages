@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from mailing.models import Mailing, Message, Receiver
+from mailing.models import Mailing, Message, Recipient
 
 
 class MailingForm(ModelForm):
@@ -10,7 +10,7 @@ class MailingForm(ModelForm):
 
 class ReceiverForm(ModelForm):
     class Meta:
-        model = Receiver
+        model = Recipient
         fields = ["email", "full_name", "commentary"]
 
 
