@@ -1,0 +1,23 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Новый получатель{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        {% if '/receiver_update/' in request.path %}
+            <button class="btn btn-success" type="submit">Изменить</button>
+        {% else %}
+            <button class="btn btn-success" type="submit">Добавить</button>
+        {% endif %}
+        <a href="{% url 'mailing:receiver_list' %}" class="btn btn-primary">Назад</a>
+
+
+    </form>
+
+</div>
+
+{% endblock %}
