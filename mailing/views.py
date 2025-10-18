@@ -4,7 +4,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from mailing import forms
-from mailing.models import Mailing
+from mailing.models import Mailing, Recipient
 from mailing.services import MailingService
 
 
@@ -101,3 +101,21 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
             return redirect("mailing:access_denied")
 
         return super().get(request, *args, **kwargs)
+
+
+class ReceiverListView(LoginRequiredMixin, ListView):
+    model = Recipient
+    template_name = "mailing/receiver_list.html"
+
+    context_object_name = "receivers"
+
+    def get_queryset(self):
+
+        user = self.request.user
+
+        if user.has_perm("mailing.can_manage_clients"):
+            return Recipient.objects.all()
+
+        queryset = user.receivers.all()
+
+        return queryset
