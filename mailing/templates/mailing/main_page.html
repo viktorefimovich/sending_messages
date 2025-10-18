@@ -1,0 +1,109 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+
+{% if not user.is_authenticated %}
+    <div class="px-4 py-5 my-5 text-center" xmlns="http://www.w3.org/1999/html">
+        <img class="d-block mx-auto mb-4" src="/static/imgs/mailing-service-logo.png" alt="" width="150">
+        <h1 class="display-5 fw-bold text-body-emphasis">Сервис по управлению рассылками.</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4">
+                Этот сервис родился благодаря онлайн школе<br>
+                <img src="https://my.sky.pro/5987ea2b7acbe5e5379157f8c4f0fb7f.svg" width="200px"><br><br>
+                Ещё надеюсь, что вы оцените логотип. Получилось очень красиво.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{% url 'users:login' %}" class="btn btn-primary btn-lg px-4 gap-3">Вход в систему</a>
+                <a href="{% url 'users:register' %}" class="btn btn-outline-secondary btn-lg px-4">Регистрация</a>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+
+    <div class="mt-5">
+
+        <div class="text-center">
+            <h1>Ваши рассылки</h1>
+            <a href="{% url 'mailing:mailing_new' %}" class="btn btn-primary">Добавить рассылку</a>
+        </div>
+        <hr>
+
+        <!--    Статус рассылки: "Создана"-->
+        <div class="mt-5">
+            <h1>Статус рассылки: "Создана"({{created|length}})</h1>
+        </div>
+        <div class="row">
+            {% if created|length > 0 %}
+                <ul class="list-group list-group-horizontal mt-2 text-center">
+                    <li class="list-group-item col-1"><h3>ID</h3></li>
+                    <li class="list-group-item col-6"><h3>Тема сообщения</h3></li>
+                </ul>
+            {% for mailing in created %}
+                <a href="{% url 'mailing:mailing_detail' mailing.pk %}" class="text-decoration-none">
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item col-1">{{mailing.pk}}</li>
+                        <li class="list-group-item col-6">{{mailing.message.subject|truncatechars:100}}</li>
+                    </ul>
+                </a>
+            {% endfor %}
+            {% else %}
+                <h2 style="color: red"><————— Пусто —————></h2>
+            {% endif %}
+        </div>
+
+        <hr>
+        <!--    Статус рассылки: "Запущена"-->
+        <div class="mt-5">
+            <h1>Статус рассылки: "Запущена"({{started|length}})</h1>
+        </div>
+        <div class="row">
+            {% if started|length > 0 %}
+            <ul class="list-group list-group-horizontal mt-2 text-center">
+                <li class="list-group-item col-1"><h3>ID</h3></li>
+                <li class="list-group-item col-6"><h3>Тема сообщения</h3></li>
+            </ul>
+            {% for mailing in started %}
+            <a href="{% url 'mailing:mailing_detail' mailing.pk %}" class="text-decoration-none">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item col-1">{{mailing.pk}}</li>
+                    <li class="list-group-item col-6">{{mailing.message.subject|truncatechars:100}}</li>
+                </ul>
+            </a>
+            {% endfor %}
+            {% else %}
+            <h2 style="color: red"><————— Пусто —————></h2>
+            {% endif %}
+        </div>
+
+        <hr>
+        <!--    Статус рассылки: "Завершена"-->
+        <div class="mt-5">
+            <h1>Статус рассылки: "Завершена"({{finished|length}})</h1>
+        </div>
+        <div class="row">
+            {% if finished|length > 0 %}
+            <ul class="list-group list-group-horizontal mt-2 text-center">
+                <li class="list-group-item col-1"><h3>ID</h3></li>
+                <li class="list-group-item col-6"><h3>Тема сообщения</h3></li>
+            </ul>
+            {% for mailing in finished %}
+            <a href="{% url 'mailing:mailing_detail' mailing.pk %}" class="text-decoration-none">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item col-1">{{mailing.pk}}</li>
+                    <li class="list-group-item col-6">{{mailing.message.subject|truncatechars:100}}</li>
+                </ul>
+            </a>
+            {% endfor %}
+            {% else %}
+            <h2 style="color: red"><————— Пусто —————></h2>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}
