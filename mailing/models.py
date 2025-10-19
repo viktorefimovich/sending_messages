@@ -30,6 +30,7 @@ class Message(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name="messages",
         verbose_name="Владелец модели сообщения",
         blank=True,
         null=True
