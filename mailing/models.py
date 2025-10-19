@@ -69,6 +69,7 @@ class Mailing(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name="mailings",
         verbose_name="Владелец модели рассылки",
         blank=True,
         null=True
