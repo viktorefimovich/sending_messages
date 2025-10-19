@@ -1,7 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
+from django.views.generic import (
+    ListView,
+    CreateView,
+    DetailView,
+    UpdateView,
+    DeleteView,
+    TemplateView,
+)
 
 from mailing import forms
 from mailing.models import Mailing, Recipient, Message, MailingAttempt
@@ -283,7 +290,7 @@ class AttemptDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        attempt_pk = self.kwargs['pk']
+        attempt_pk = self.kwargs["pk"]
 
         can_view = [
             MailingAttemptsService.is_attempt_owner(attempt_pk=attempt_pk, user=user)
