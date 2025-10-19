@@ -1,0 +1,18 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Подтвердите почту{% endblock %}
+
+{% block content %}
+
+<div class="text-center mt-5">
+    <h1>Вам на почту будет отправлен пароль.</h1>
+    <form action="" method="post" class="mt-4">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" class="btn btn-primary">
+            Восстановить
+        </button>
+    </form>
+</div>
+
+{% endblock %}
