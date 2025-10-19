@@ -24,14 +24,12 @@
 {% else %}
 
     <div class="mt-5">
-
         <div class="text-center">
             <h1>Ваши рассылки</h1>
             <a href="{% url 'mailing:mailing_new' %}" class="btn btn-primary">Добавить рассылку</a>
         </div>
         <hr>
 
-        <!--    Статус рассылки: "Создана"-->
         <div class="mt-5">
             <h1>Статус рассылки: "Создана"({{created|length}})</h1>
         </div>
@@ -50,12 +48,11 @@
                 </a>
             {% endfor %}
             {% else %}
-                <h2 style="color: red"><————— Пусто —————></h2>
+                <h2 style="color: red">Здесь пока пусто</h2>
             {% endif %}
         </div>
 
         <hr>
-        <!--    Статус рассылки: "Запущена"-->
         <div class="mt-5">
             <h1>Статус рассылки: "Запущена"({{started|length}})</h1>
         </div>
@@ -74,12 +71,11 @@
             </a>
             {% endfor %}
             {% else %}
-            <h2 style="color: red"><————— Пусто —————></h2>
+            <h2 style="color: red">Здесь пока пусто</h2>
             {% endif %}
         </div>
 
         <hr>
-        <!--    Статус рассылки: "Завершена"-->
         <div class="mt-5">
             <h1>Статус рассылки: "Завершена"({{finished|length}})</h1>
         </div>
@@ -98,10 +94,9 @@
             </a>
             {% endfor %}
             {% else %}
-            <h2 style="color: red"><————— Пусто —————></h2>
+            <h2 style="color: red">Здесь пока пусто</h2>
             {% endif %}
         </div>
-
     </div>
 
 {% endif %}
