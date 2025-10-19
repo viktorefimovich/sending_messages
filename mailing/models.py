@@ -10,6 +10,7 @@ class Recipient(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name="receivers",
         verbose_name="Владелец модели получателя",
         blank=True,
         null=True

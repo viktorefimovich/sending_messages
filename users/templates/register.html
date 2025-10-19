@@ -9,20 +9,14 @@
         {% csrf_token %}
         {{form.as_p}}
         {% if '/update/' in request.path %}
-                <button type="submit" class="btn btn-primary">Обновить данные</button>
-                <a href="{% url 'users:profile_detail' user.pk %}" class="btn btn-primary">Назад</a>
+        <button type="submit" class="btn btn-primary">Обновить данные</button>
+        <a href="{% url 'users:profile_detail' user.pk %}" class="btn btn-primary">Назад</a>
 
-            {% else %}
-                <button type="submit" class="btn btn-primary">Регистрация</button>
+        {% else %}
+        <button type="submit" class="btn btn-primary">Регистрация</button>
 
-            {% endif %}
-
-
-
+        {% endif %}
     </form>
-
 </div>
-
-
 
 {% endblock %}
