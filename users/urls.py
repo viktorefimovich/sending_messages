@@ -1,5 +1,3 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import path
 from django.views.generic import TemplateView
 
@@ -47,4 +45,4 @@ urlpatterns = [path("login/", LoginView.as_view(template_name="users/login.html"
                    views.MyPasswordResetCompleteView.as_view(),
                    name="password_reset_complete",
                ),
-               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+               ]
