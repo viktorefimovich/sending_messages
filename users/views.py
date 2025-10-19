@@ -11,12 +11,9 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import DetailView
 from django.core.mail import send_mail
-from .forms import (
-    MailingUserCreationForm,
-    MailingUserChangeForm,
-)
 
 from config.settings import EMAIL_HOST_USER
+from .forms import MailingUserCreationForm, MailingUserChangeForm
 from .models import User
 
 

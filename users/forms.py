@@ -26,7 +26,7 @@ class StyleFormMixin:
                 field.widget.attrs['class'] = 'form-control'
 
 
-class MailingUserCreationForm(StyleFormMixin, UserCreationForm):
+class MailingUserCreationForm(UserCreationForm):
     phone_number = forms.CharField(
         max_length=15, required=True, help_text="Введите ваш номер телефона."
     )
@@ -49,7 +49,7 @@ class MailingUserCreationForm(StyleFormMixin, UserCreationForm):
         )
 
 
-class MailingUserChangeForm(StyleFormMixin, UserChangeForm):
+class MailingUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = (
