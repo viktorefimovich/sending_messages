@@ -1,0 +1,11 @@
+{% extends 'mailing/base.html' %}
+
+
+{% block title %}Доступ запрещён{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1>У вас недостаточно прав для просмотра данной страницы</h1>
+    <a href="{% url 'mailing:main_page' %}" class="btn btn-primary mt-5">На главную</a>
+</div>
+{% endblock %}

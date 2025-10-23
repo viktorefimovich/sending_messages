@@ -1,0 +1,23 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-3"></div>
+
+        <div class="col-6">
+            <h1>Хотете удалить "{{receiver.full_name}}" ?</h1>
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">Удалить</button>
+                <a href="{% url 'mailing:main_page' %}" class="btn btn-primary">Назад</a>
+            </form>
+        </div>
+
+        <div class="col-3"></div>
+    </div>
+
+</div>
+
+{% endblock %}

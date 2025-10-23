@@ -1,0 +1,13 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Подтвердите почту{% endblock %}
+
+{% block content %}
+
+<div class="mt-5">
+    <p>Ссылка для сброса была отправлена на почту</p>
+    <p>Если не найдете письмо в исходящих. Проверьте, пожалуйста, так же в спаме</p>
+    <a href="{% url 'mailing:main_page' %}" class="btn btn-primary">На главную</a>
+</div>
+
+{% endblock %}
